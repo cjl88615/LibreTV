@@ -1,0 +1,17 @@
+[Unit]
+Description=Taliabu Spider Runtime Gateway
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/taliabu-spider-gateway
+EnvironmentFile=/opt/taliabu-spider-gateway/.env
+ExecStart=/usr/bin/node /opt/taliabu-spider-gateway/server.js
+Restart=always
+RestartSec=3
+TimeoutStopSec=15
+
+[Install]
+WantedBy=multi-user.target
