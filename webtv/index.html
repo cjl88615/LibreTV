@@ -5,179 +5,177 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="no-referrer">
   <title>Taliabu WebTV</title>
-  <meta name="description" content="Taliabu WebTV - 个人 TVBox 源的网页影视入口">
+  <meta name="description" content="Taliabu WebTV - TVBox 饭太硬多源网页入口">
   <link rel="icon" href="/image/logo.png">
   <script src="/libs/tailwindcss.min.js"></script>
   <link rel="stylesheet" href="/css/styles.css">
   <style>
-    html { background:#080808; }
-    body { background:#080808; color:#fff; min-height:100vh; }
-    .panel { background:#111; border:1px solid #282828; border-radius:16px; }
-    .movie-card { transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease; }
-    .movie-card:hover { transform:translateY(-4px); border-color:#6d28d9; box-shadow:0 12px 30px rgba(0,0,0,.35); }
-    .poster { aspect-ratio:2/3; background:#161616; object-fit:cover; }
-    .nav-btn.active,.tag-btn.active,.line-btn.active { background:#7c3aed; border-color:#8b5cf6; color:#fff; }
-    .channel.active { background:#251638; border-color:#7c3aed; }
-    .scrollbar::-webkit-scrollbar { width:7px; height:7px; }
-    .scrollbar::-webkit-scrollbar-thumb { background:#353535; border-radius:8px; }
-    .line-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-    .line-clamp-3 { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+    html,body{background:#080808;color:#fff;min-height:100vh}.panel{background:#111;border:1px solid #282828;border-radius:16px}.movie-card{transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}.movie-card:hover{transform:translateY(-4px);border-color:#6d28d9;box-shadow:0 12px 30px rgba(0,0,0,.35)}.poster{aspect-ratio:2/3;background:#161616;object-fit:cover}.nav-btn.active,.tag-btn.active,.line-btn.active{background:#7c3aed;border-color:#8b5cf6;color:#fff}.channel.active{background:#251638;border-color:#7c3aed}.source-card{transition:.15s ease}.source-card:hover{border-color:#7c3aed;background:#191327}.source-card.disabled{opacity:.55}.scrollbar::-webkit-scrollbar{width:7px;height:7px}.scrollbar::-webkit-scrollbar-thumb{background:#353535;border-radius:8px}.line-clamp-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.line-clamp-3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
   </style>
 </head>
 <body>
-  <header class="sticky top-0 z-40 bg-black/90 backdrop-blur-xl border-b border-[#222]">
-    <div class="max-w-7xl mx-auto px-3 md:px-5 py-3">
-      <div class="flex items-center gap-3">
-        <button id="brandBtn" class="flex items-center gap-2 shrink-0">
-          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center font-bold">T</div>
-          <div class="hidden sm:block text-left">
-            <div class="font-bold leading-tight">Taliabu WebTV</div>
-            <div id="miniSourceStatus" class="text-[11px] text-gray-500">正在连接 TVBox 源…</div>
-          </div>
-        </button>
-
-        <form id="searchForm" class="flex-1 max-w-2xl mx-auto flex">
-          <input id="searchInput" type="search" autocomplete="off" placeholder="搜索电影、电视剧、动漫…" class="w-full bg-[#151515] border border-[#343434] border-r-0 rounded-l-xl px-4 py-2.5 outline-none focus:border-violet-500 text-sm">
-          <button class="px-4 md:px-5 rounded-r-xl bg-violet-600 hover:bg-violet-700 text-sm font-medium">搜索</button>
-        </form>
-
-        <button id="refreshBtn" title="刷新" class="shrink-0 w-10 h-10 rounded-xl border border-[#333] bg-[#171717] hover:bg-[#222] flex items-center justify-center">↻</button>
-      </div>
-
-      <nav class="flex gap-2 mt-3 overflow-x-auto scrollbar pb-1 text-sm">
-        <button class="nav-btn active px-4 py-1.5 rounded-full border border-[#333] bg-[#171717] whitespace-nowrap" data-section="home">首页</button>
-        <button class="nav-btn px-4 py-1.5 rounded-full border border-[#333] bg-[#171717] whitespace-nowrap" data-section="movie">电影</button>
-        <button class="nav-btn px-4 py-1.5 rounded-full border border-[#333] bg-[#171717] whitespace-nowrap" data-section="tv">电视剧</button>
-        <button class="nav-btn px-4 py-1.5 rounded-full border border-[#333] bg-[#171717] whitespace-nowrap" data-section="live">📺 直播</button>
-        <button class="nav-btn px-4 py-1.5 rounded-full border border-[#333] bg-[#171717] whitespace-nowrap" data-section="sources">源状态</button>
-      </nav>
-    </div>
-  </header>
-
-  <main class="max-w-7xl mx-auto px-3 md:px-5 py-5">
-    <section id="homeSection">
-      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
-        <div>
-          <div class="text-xs text-violet-400 font-medium">实时推荐</div>
-          <h1 id="recommendTitle" class="text-2xl md:text-3xl font-bold mt-1">热门电影</h1>
-          <p class="text-sm text-gray-500 mt-1">推荐标题实时更新，点击后自动匹配可播放线路。</p>
+<header class="sticky top-0 z-40 bg-black/90 backdrop-blur-xl border-b border-[#222]">
+  <div class="max-w-7xl mx-auto px-3 md:px-5 py-3">
+    <div class="flex items-center gap-3">
+      <button id="brandBtn" class="flex items-center gap-2 shrink-0">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center font-bold">T</div>
+        <div class="hidden sm:block text-left">
+          <div class="font-bold leading-tight">Taliabu WebTV</div>
+          <div id="miniSourceStatus" class="text-[11px] text-gray-500">正在连接 TVBox 源…</div>
         </div>
-        <button id="nextBatchBtn" class="self-start md:self-auto px-4 py-2 rounded-xl border border-[#333] bg-[#171717] hover:bg-[#222] text-sm">换一批</button>
+      </button>
+      <form id="searchForm" class="flex-1 max-w-2xl mx-auto flex">
+        <input id="searchInput" type="search" autocomplete="off" placeholder="搜索电影、电视剧、动漫…" class="w-full bg-[#151515] border border-[#343434] border-r-0 rounded-l-xl px-4 py-2.5 outline-none focus:border-violet-500 text-sm">
+        <button class="px-4 md:px-5 rounded-r-xl bg-violet-600 hover:bg-violet-700 text-sm font-medium">搜索</button>
+      </form>
+      <button id="refreshBtn" title="刷新" class="shrink-0 w-10 h-10 rounded-xl border border-[#333] bg-[#171717] hover:bg-[#222] flex items-center justify-center">↻</button>
+    </div>
+    <nav class="flex gap-2 mt-3 overflow-x-auto scrollbar pb-1 text-sm">
+      <button class="nav-btn active px-4 py-1.5 rounded-full border border-[#333] bg-[#171717] whitespace-nowrap" data-section="home">首页</button>
+      <button class="nav-btn px-4 py-1.5 rounded-full border border-[#333] bg-[#171717] whitespace-nowrap" data-section="movie">电影</button>
+      <button class="nav-btn px-4 py-1.5 rounded-full border border-[#333] bg-[#171717] whitespace-nowrap" data-section="tv">电视剧</button>
+      <button class="nav-btn px-4 py-1.5 rounded-full border border-[#333] bg-[#171717] whitespace-nowrap" data-section="live">📺 直播</button>
+      <button class="nav-btn px-4 py-1.5 rounded-full border border-[#333] bg-[#171717] whitespace-nowrap" data-section="sources">源状态</button>
+    </nav>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-3 md:px-5 py-5">
+  <section id="homeSection">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
+      <div>
+        <div class="text-xs text-violet-400 font-medium">实时推荐</div>
+        <h1 id="recommendTitle" class="text-2xl md:text-3xl font-bold mt-1">热门电影</h1>
+        <p class="text-sm text-gray-500 mt-1">点击影片后先选择饭太硬中的来源，像 TVBox 一样由您自己决定用哪个源。</p>
       </div>
+      <button id="nextBatchBtn" class="self-start md:self-auto px-4 py-2 rounded-xl border border-[#333] bg-[#171717] hover:bg-[#222] text-sm">换一批</button>
+    </div>
+    <div id="tagBar" class="flex gap-2 overflow-x-auto scrollbar pb-3 mb-2"></div>
+    <div id="recommendStatus" class="text-sm text-gray-500 mb-3"></div>
+    <div id="recommendGrid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3 md:gap-4"></div>
 
-      <div id="tagBar" class="flex gap-2 overflow-x-auto scrollbar pb-3 mb-2"></div>
-      <div id="recommendStatus" class="text-sm text-gray-500 mb-3"></div>
-      <div id="recommendGrid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3 md:gap-4"></div>
-
-      <section id="searchSection" class="hidden mt-8 pt-6 border-t border-[#242424]">
-        <div class="flex items-center justify-between gap-3 mb-4">
-          <div>
-            <div class="text-xs text-violet-400">可播放搜索结果</div>
-            <h2 id="searchTitle" class="text-xl font-bold mt-1">搜索结果</h2>
-          </div>
+    <section id="searchSection" class="hidden mt-8 pt-6 border-t border-[#242424]">
+      <div class="flex items-center justify-between gap-3 mb-4">
+        <div>
+          <div id="searchSourceLabel" class="text-xs text-violet-400">当前来源</div>
+          <h2 id="searchTitle" class="text-xl font-bold mt-1">搜索结果</h2>
+        </div>
+        <div class="flex gap-2">
+          <button id="changeSearchSourceBtn" class="text-sm px-3 py-1.5 rounded-lg bg-violet-700/40 border border-violet-700">换源</button>
           <button id="closeSearchBtn" class="text-sm px-3 py-1.5 rounded-lg bg-[#181818] border border-[#333]">关闭</button>
         </div>
-        <div id="searchStatus" class="text-sm text-gray-500 mb-3"></div>
-        <div id="searchGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4"></div>
-      </section>
+      </div>
+      <div id="searchStatus" class="text-sm text-gray-500 mb-3"></div>
+      <div id="searchGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4"></div>
     </section>
+  </section>
 
-    <section id="liveSection" class="hidden">
-      <div class="grid lg:grid-cols-[330px_1fr] gap-5">
-        <aside class="panel overflow-hidden">
-          <div class="p-4 border-b border-[#252525]">
-            <div class="flex items-center justify-between gap-2">
-              <div>
-                <h2 class="font-semibold">电视直播</h2>
-                <p id="liveInfo" class="text-xs text-gray-500 mt-1">等待加载</p>
-              </div>
-              <select id="liveSourceSelect" class="max-w-[150px] bg-[#191919] border border-[#333] rounded-lg px-2 py-1 text-sm"></select>
-            </div>
-            <input id="channelSearch" type="search" placeholder="搜索频道…" class="mt-3 w-full bg-[#0d0d0d] border border-[#333] rounded-lg px-3 py-2 outline-none focus:border-violet-500">
+  <section id="liveSection" class="hidden">
+    <div class="grid lg:grid-cols-[330px_1fr] gap-5">
+      <aside class="panel overflow-hidden">
+        <div class="p-4 border-b border-[#252525]">
+          <div class="flex items-center justify-between gap-2">
+            <div><h2 class="font-semibold">电视直播</h2><p id="liveInfo" class="text-xs text-gray-500 mt-1">等待加载</p></div>
+            <select id="liveSourceSelect" class="max-w-[150px] bg-[#191919] border border-[#333] rounded-lg px-2 py-1 text-sm"></select>
           </div>
-          <div id="channelList" class="max-h-[72vh] overflow-y-auto scrollbar p-2">
-            <div class="text-center text-gray-500 py-10">打开直播页后加载频道</div>
-          </div>
-        </aside>
-        <div class="panel p-4 h-fit">
-          <div class="flex items-center justify-between gap-3 mb-3">
-            <div>
-              <div class="text-xs text-gray-500">正在播放</div>
-              <h2 id="liveNowPlaying" class="font-semibold mt-1">请选择频道</h2>
-            </div>
-          </div>
-          <div class="aspect-video bg-black rounded-xl overflow-hidden border border-[#222] relative">
-            <video id="liveVideo" controls playsinline class="w-full h-full bg-black"></video>
-            <div id="livePlayerHint" class="absolute inset-0 flex items-center justify-center text-gray-500 pointer-events-none px-6 text-center">选择频道后开始播放</div>
-          </div>
+          <input id="channelSearch" type="search" placeholder="搜索频道…" class="mt-3 w-full bg-[#0d0d0d] border border-[#333] rounded-lg px-3 py-2 outline-none focus:border-violet-500">
         </div>
-      </div>
-    </section>
-
-    <section id="sourcesSection" class="hidden space-y-5">
-      <div class="panel p-5">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <div class="text-sm text-gray-400">当前 TVBox 配置</div>
-            <div id="sourceUrl" class="font-mono text-sm break-all mt-1">加载中…</div>
-            <div id="sourceTime" class="text-xs text-gray-500 mt-2"></div>
-          </div>
-          <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-center">
-            <div class="bg-[#171717] border border-[#2c2c2c] rounded-xl p-3"><div id="siteCount" class="text-xl font-bold">-</div><div class="text-xs text-gray-500">站点</div></div>
-            <div class="bg-[#171717] border border-[#2c2c2c] rounded-xl p-3"><div id="liveSourceCount" class="text-xl font-bold">-</div><div class="text-xs text-gray-500">直播源</div></div>
-            <div class="bg-[#171717] border border-[#2c2c2c] rounded-xl p-3"><div id="jarCount" class="text-xl font-bold">-</div><div class="text-xs text-gray-500">JAR</div></div>
-            <div class="bg-[#171717] border border-[#2c2c2c] rounded-xl p-3"><div id="jsCount" class="text-xl font-bold">-</div><div class="text-xs text-gray-500">JS</div></div>
-            <div class="bg-[#171717] border border-[#2c2c2c] rounded-xl p-3"><div id="webCount" class="text-xl font-bold">-</div><div class="text-xs text-gray-500">Web</div></div>
-          </div>
+        <div id="channelList" class="max-h-[72vh] overflow-y-auto scrollbar p-2"><div class="text-center text-gray-500 py-10">打开直播页后加载频道</div></div>
+      </aside>
+      <div class="panel p-4 h-fit">
+        <div class="mb-3"><div class="text-xs text-gray-500">正在播放</div><h2 id="liveNowPlaying" class="font-semibold mt-1">请选择频道</h2></div>
+        <div class="aspect-video bg-black rounded-xl overflow-hidden border border-[#222] relative">
+          <video id="liveVideo" controls playsinline class="w-full h-full bg-black"></video>
+          <div id="livePlayerHint" class="absolute inset-0 flex items-center justify-center text-gray-500 pointer-events-none px-6 text-center">选择频道后开始播放</div>
         </div>
-        <div id="sourceStatus" class="mt-4 text-sm text-gray-400"></div>
-      </div>
-      <div class="panel p-5">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h2 class="font-semibold">TVBox 站点运行时</h2>
-            <p class="text-xs text-gray-500 mt-1">JAR Spider 是手机版原生能力；当前网页点播通过可播放 CMS 适配层提供。</p>
-          </div>
-        </div>
-        <div id="siteList" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-3"></div>
-      </div>
-    </section>
-  </main>
-
-  <div id="detailModal" class="fixed inset-0 z-50 hidden bg-black/90 backdrop-blur-sm p-3 md:p-6 overflow-y-auto">
-    <div class="max-w-5xl mx-auto panel overflow-hidden relative">
-      <button id="closeDetailBtn" class="absolute right-3 top-3 z-10 w-9 h-9 rounded-full bg-black/70 border border-[#444] text-xl">×</button>
-      <div class="grid md:grid-cols-[230px_1fr] gap-5 p-4 md:p-6">
-        <div>
-          <img id="detailPoster" class="w-full poster rounded-xl border border-[#292929]" alt="封面">
-        </div>
-        <div class="min-w-0">
-          <div class="text-xs text-violet-400" id="detailSource"></div>
-          <h2 id="detailTitle" class="text-2xl md:text-3xl font-bold mt-1"></h2>
-          <div id="detailMeta" class="text-sm text-gray-400 mt-2"></div>
-          <div id="detailPeople" class="text-sm text-gray-500 mt-3 leading-6"></div>
-          <p id="detailContent" class="text-sm text-gray-400 mt-4 leading-6 line-clamp-3"></p>
-        </div>
-      </div>
-
-      <div class="px-4 md:px-6 pb-5">
-        <div id="vodPlayerBox" class="hidden mb-5">
-          <div class="aspect-video bg-black rounded-xl overflow-hidden border border-[#262626] relative">
-            <video id="vodVideo" controls playsinline class="w-full h-full bg-black"></video>
-            <div id="vodPlayerHint" class="hidden absolute inset-0 items-center justify-center bg-black/75 text-gray-300 px-8 text-center"></div>
-          </div>
-          <div id="vodPlayingName" class="text-sm text-gray-400 mt-2"></div>
-        </div>
-
-        <div class="flex items-center gap-2 overflow-x-auto scrollbar pb-2" id="lineTabs"></div>
-        <div id="episodeList" class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9 gap-2 mt-3"></div>
       </div>
     </div>
+  </section>
+
+  <section id="sourcesSection" class="hidden space-y-5">
+    <div class="panel p-5">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <div class="text-sm text-gray-400">当前 TVBox 配置</div>
+          <div id="sourceUrl" class="font-mono text-sm break-all mt-1">加载中…</div>
+          <div id="sourceTime" class="text-xs text-gray-500 mt-2"></div>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-center">
+          <div class="bg-[#171717] border border-[#2c2c2c] rounded-xl p-3"><div id="siteCount" class="text-xl font-bold">-</div><div class="text-xs text-gray-500">站点</div></div>
+          <div class="bg-[#171717] border border-[#2c2c2c] rounded-xl p-3"><div id="liveSourceCount" class="text-xl font-bold">-</div><div class="text-xs text-gray-500">直播源</div></div>
+          <div class="bg-[#171717] border border-[#2c2c2c] rounded-xl p-3"><div id="jarCount" class="text-xl font-bold">-</div><div class="text-xs text-gray-500">JAR</div></div>
+          <div class="bg-[#171717] border border-[#2c2c2c] rounded-xl p-3"><div id="jsCount" class="text-xl font-bold">-</div><div class="text-xs text-gray-500">JS</div></div>
+          <div class="bg-[#171717] border border-[#2c2c2c] rounded-xl p-3"><div id="webCount" class="text-xl font-bold">-</div><div class="text-xs text-gray-500">Web</div></div>
+        </div>
+      </div>
+      <div id="sourceStatus" class="mt-4 text-sm text-gray-400"></div>
+    </div>
+    <div class="panel p-5">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <div><h2 class="font-semibold">Spider Runtime</h2><p class="text-xs text-gray-500 mt-1">饭太硬 JAR 源必须由影视-K Android 执行。</p></div>
+        <div id="runtimeStatusBadge" class="px-3 py-1.5 rounded-full text-xs border border-[#444] bg-[#171717]">检查中…</div>
+      </div>
+      <div id="runtimeStatusText" class="text-sm text-gray-400"></div>
+    </div>
+    <div class="panel p-5">
+      <div class="mb-4"><h2 class="font-semibold">饭太硬站点</h2><p class="text-xs text-gray-500 mt-1">这些就是 WebTV 选源时展示的来源；不再固定成三个外部资源站。</p></div>
+      <div id="siteList" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+    </div>
+  </section>
+</main>
+
+<!-- 饭太硬来源选择器 -->
+<div id="sourcePickerModal" class="fixed inset-0 z-[55] hidden bg-black/90 backdrop-blur-sm p-3 md:p-6 overflow-y-auto">
+  <div class="max-w-5xl mx-auto panel p-4 md:p-6 relative">
+    <button id="closeSourcePickerBtn" class="absolute right-3 top-3 w-9 h-9 rounded-full bg-black/70 border border-[#444] text-xl">×</button>
+    <div class="pr-12">
+      <div class="text-xs text-violet-400">TVBox 式选源</div>
+      <h2 id="sourcePickerTitle" class="text-2xl font-bold mt-1">选择来源</h2>
+      <p class="text-sm text-gray-500 mt-2">饭太硬配置中的可搜索站点全部列在下面。点哪个，就只用哪个 Spider 搜索。</p>
+    </div>
+    <div class="mt-4 flex flex-col sm:flex-row gap-3 sm:items-center">
+      <input id="sourceFilterInput" type="search" placeholder="筛选来源，例如：厂长、海绵、糯米…" class="flex-1 bg-[#0d0d0d] border border-[#333] rounded-xl px-4 py-2.5 outline-none focus:border-violet-500">
+      <div id="sourcePickerRuntime" class="text-xs px-3 py-2 rounded-xl border border-[#333] bg-[#171717]">Runtime 检查中…</div>
+    </div>
+    <div id="sourcePickerHint" class="mt-3 text-sm text-gray-500"></div>
+    <div id="sourcePickerGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-2 mt-4"></div>
+    <div class="mt-5 pt-4 border-t border-[#292929] flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
+      <p class="text-xs text-gray-500">“备用网页源”保留旧 CMS 方案，只作兜底，不再自动替您选源。</p>
+      <button id="fallbackCmsBtn" class="px-4 py-2 rounded-xl border border-[#444] bg-[#181818] hover:bg-[#222] text-sm">备用网页源</button>
+    </div>
   </div>
+</div>
 
-  <div id="toast" class="fixed left-1/2 -translate-x-1/2 bottom-6 z-[70] hidden max-w-[90vw] px-4 py-2.5 rounded-xl bg-[#222] border border-[#444] text-sm shadow-xl"></div>
+<!-- 详情 -->
+<div id="detailModal" class="fixed inset-0 z-50 hidden bg-black/90 backdrop-blur-sm p-3 md:p-6 overflow-y-auto">
+  <div class="max-w-5xl mx-auto panel overflow-hidden relative">
+    <button id="closeDetailBtn" class="absolute right-3 top-3 z-10 w-9 h-9 rounded-full bg-black/70 border border-[#444] text-xl">×</button>
+    <div class="grid md:grid-cols-[230px_1fr] gap-5 p-4 md:p-6">
+      <div><img id="detailPoster" class="w-full poster rounded-xl border border-[#292929]" alt="封面"></div>
+      <div class="min-w-0 pr-10">
+        <div class="flex flex-wrap gap-2 items-center"><div class="text-xs text-violet-400" id="detailSource"></div><button id="detailChangeSourceBtn" class="hidden text-xs px-2.5 py-1 rounded-full border border-violet-700 bg-violet-900/30">换源</button></div>
+        <h2 id="detailTitle" class="text-2xl md:text-3xl font-bold mt-1"></h2>
+        <div id="detailMeta" class="text-sm text-gray-400 mt-2"></div>
+        <div id="detailPeople" class="text-sm text-gray-500 mt-3 leading-6"></div>
+        <p id="detailContent" class="text-sm text-gray-400 mt-4 leading-6 line-clamp-3"></p>
+      </div>
+    </div>
+    <div class="px-4 md:px-6 pb-5">
+      <div id="vodPlayerBox" class="hidden mb-5">
+        <div class="aspect-video bg-black rounded-xl overflow-hidden border border-[#262626] relative">
+          <video id="vodVideo" controls playsinline class="w-full h-full bg-black"></video>
+          <div id="vodPlayerHint" class="hidden absolute inset-0 items-center justify-center bg-black/75 text-gray-300 px-8 text-center"></div>
+        </div>
+        <div id="vodPlayingName" class="text-sm text-gray-400 mt-2"></div>
+      </div>
+      <div class="flex items-center gap-2 overflow-x-auto scrollbar pb-2" id="lineTabs"></div>
+      <div id="episodeList" class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9 gap-2 mt-3"></div>
+    </div>
+  </div>
+</div>
 
-  <script src="/libs/hls.min.js"></script>
-  <script src="/js/tvbox-web.js"></script>
+<div id="toast" class="fixed left-1/2 -translate-x-1/2 bottom-6 z-[70] hidden max-w-[90vw] px-4 py-2.5 rounded-xl bg-[#222] border border-[#444] text-sm shadow-xl"></div>
+<script src="/libs/hls.min.js"></script>
+<script src="/js/tvbox-web.js?v=3.0"></script>
 </body>
 </html>
