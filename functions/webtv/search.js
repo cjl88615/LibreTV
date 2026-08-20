@@ -1,5 +1,7 @@
 const DEFAULT_SOURCES = [
-  { key: 'qiqi', name: '七七资源', api: 'https://www.qiqidys.com/api.php/provide/vod' }
+  { key: 'jisu', name: '极速资源', api: 'https://jszyapi.com/api.php/provide/vod/from/jsm3u8/at/json' },
+  { key: 'iqiyi', name: '爱奇艺资源', api: 'https://iqiyizyapi.com/api.php/provide/vod' },
+  { key: 'subo', name: '速播资源', api: 'https://subocj.com/api.php/provide/vod/from/subm3u8/at/json' }
 ];
 
 export async function onRequest({ request, env }) {
@@ -15,11 +17,18 @@ export async function onRequest({ request, env }) {
   const errors = [];
 
   settled.forEach((item, index) => {
-    if (item.status === 'fulfilled') results.push(...item.value);
-    else errors.push({ source: sources[index]?.name || sources[index]?.key || 'unknown', error: item.reason?.message || '请求失败' });
+    if (item.status === 'fulfilled') {
+      results.push(...item.value);
+    } else {
+      errors.push({
+        source: sources[index]?.name || sources[index]?.key || 'unknown',
+        error: item.reason?.message || '请求失败'
+      });
+    }
   });
 
   results.sort((a, b) => b.matchScore - a.matchScore || String(b.year || '').localeCompare(String(a.year || '')));
+
   const dedup = [];
   const seen = new Set();
   for (const item of results) {
@@ -27,41 +36,98 @@ export async function onRequest({ request, env }) {
     if (seen.has(key)) continue;
     seen.add(key);
     dedup.push(item);
-    if (dedup.length >= 60) break;
+    if (dedup.length >= 80) break;
   }
 
-  return json({ ok: true, keyword, year, results: dedup, sourceCount: sources.length, errors });
+  return json({
+    ok: true,
+    keyword,
+    year,
+    results: dedup,
+    sourceCount: sources.length,
+    workingSources: [...new Set(dedup.map(v => v.sourceKey))],
+    errors
+  });
 }
 
 async function searchSource(source, keyword, year) {
+  const candidates = buildSearchTerms(keyword);
+  let lastError = null;
+
+  for (const term of candidates) {
+    try {
+      const list = await fetchSearch(source, term);
+      if (list.length) {
+        return list
+          .map(v => normalizeVod(v, source, keyword, year))
+          .filter(Boolean)
+          .filter(v => v.matchScore >= 35);
+      }
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  if (lastError) throw lastError;
+  return [];
+}
+
+async function fetchSearch(source, keyword) {
   const target = new URL(source.api);
   target.searchParams.set('ac', 'videolist');
   target.searchParams.set('wd', keyword);
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 12000);
+  const timeout = setTimeout(() => controller.abort(), 10000);
   try {
     const response = await fetch(target.toString(), {
       signal: controller.signal,
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Taliabu-WebTV/2.0)',
-        'Accept': 'application/json,text/plain,*/*'
+        'User-Agent': 'Mozilla/5.0 (Taliabu-WebTV/2.1)',
+        'Accept': 'application/json,text/plain,*/*',
+        'Referer': new URL(source.api).origin + '/'
       },
       redirect: 'follow'
     });
+
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = JSON.parse((await response.text()).replace(/^\uFEFF/, ''));
-    const list = Array.isArray(data.list) ? data.list : [];
-    return list.map(v => normalizeVod(v, source, keyword, year)).filter(Boolean);
+
+    const text = (await response.text()).replace(/^\uFEFF/, '');
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error('返回内容不是有效 JSON');
+    }
+
+    return Array.isArray(data.list) ? data.list : [];
   } finally {
     clearTimeout(timeout);
   }
+}
+
+function buildSearchTerms(keyword) {
+  const terms = [keyword];
+  const cleaned = keyword
+    .replace(/[：:·・—_\-（）()【】\[\]“”"'《》]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (cleaned && cleaned !== keyword) terms.push(cleaned);
+
+  const noSeason = cleaned
+    .replace(/第[一二三四五六七八九十0-9]+季$/u, '')
+    .replace(/\s*(?:season\s*\d+|s\d+)$/i, '')
+    .trim();
+  if (noSeason && !terms.includes(noSeason)) terms.push(noSeason);
+
+  return terms.slice(0, 3);
 }
 
 function normalizeVod(v, source, keyword, wantedYear) {
   const id = v?.vod_id ?? v?.id;
   const name = String(v?.vod_name || v?.name || '').trim();
   if (id === undefined || id === null || !name) return null;
+
   const year = String(v?.vod_year || '').trim();
   return {
     id: String(id),
@@ -80,16 +146,29 @@ function scoreMatch(name, keyword, year, wantedYear) {
   const a = compact(name);
   const b = compact(keyword);
   let score = 0;
-  if (a === b) score += 100;
-  else if (a.startsWith(b) || b.startsWith(a)) score += 80;
-  else if (a.includes(b) || b.includes(a)) score += 60;
-  else score += 10;
+
+  if (a === b) score += 120;
+  else if (a.startsWith(b) || b.startsWith(a)) score += 90;
+  else if (a.includes(b) || b.includes(a)) score += 65;
+  else {
+    const overlap = tokenOverlap(name, keyword);
+    score += Math.round(overlap * 50);
+  }
+
   if (wantedYear && year && wantedYear === year) score += 20;
   return score;
 }
 
+function tokenOverlap(a, b) {
+  const aa = [...new Set(compact(a).split(''))];
+  const bb = new Set(compact(b).split(''));
+  if (!aa.length || !bb.size) return 0;
+  const hit = aa.filter(ch => bb.has(ch)).length;
+  return hit / Math.max(aa.length, bb.size);
+}
+
 function compact(text) {
-  return String(text || '').toLowerCase().replace(/[\s·・:：,，.。!！?？\-—_()（）\[\]【】]/g, '');
+  return String(text || '').toLowerCase().replace(/[\s·・:：,，.。!！?？\-—_()（）\[\]【】《》“”"']/g, '');
 }
 
 function getSources(env) {
