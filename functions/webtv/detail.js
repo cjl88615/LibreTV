@@ -1,5 +1,7 @@
 const DEFAULT_SOURCES = [
-  { key: 'qiqi', name: '七七资源', api: 'https://www.qiqidys.com/api.php/provide/vod' }
+  { key: 'jisu', name: '极速资源', api: 'https://jszyapi.com/api.php/provide/vod/from/jsm3u8/at/json' },
+  { key: 'iqiyi', name: '爱奇艺资源', api: 'https://iqiyizyapi.com/api.php/provide/vod' },
+  { key: 'subo', name: '速播资源', api: 'https://subocj.com/api.php/provide/vod/from/subm3u8/at/json' }
 ];
 
 export async function onRequest({ request, env }) {
@@ -16,19 +18,37 @@ export async function onRequest({ request, env }) {
     target.searchParams.set('ac', 'videolist');
     target.searchParams.set('ids', id);
 
-    const response = await fetch(target.toString(), {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Taliabu-WebTV/2.0)',
-        'Accept': 'application/json,text/plain,*/*'
-      },
-      redirect: 'follow'
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+    let response;
+    try {
+      response = await fetch(target.toString(), {
+        signal: controller.signal,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Taliabu-WebTV/2.1)',
+          'Accept': 'application/json,text/plain,*/*',
+          'Referer': new URL(source.api).origin + '/'
+        },
+        redirect: 'follow'
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
+
     if (!response.ok) return json({ ok: false, error: `详情接口 HTTP ${response.status}` }, 502);
 
-    const data = JSON.parse((await response.text()).replace(/^\uFEFF/, ''));
+    const text = (await response.text()).replace(/^\uFEFF/, '');
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      return json({ ok: false, error: '详情接口返回内容不是有效 JSON' }, 502);
+    }
+
     const vod = Array.isArray(data.list) ? data.list[0] : null;
     if (!vod) return json({ ok: false, error: '详情接口没有返回影片数据' }, 404);
 
+    const lines = parsePlayLines(vod.vod_play_from, vod.vod_play_url);
     const result = {
       id: String(vod.vod_id ?? id),
       name: String(vod.vod_name || ''),
@@ -42,10 +62,10 @@ export async function onRequest({ request, env }) {
       typeName: String(vod.type_name || ''),
       sourceKey: source.key,
       sourceName: source.name,
-      lines: parsePlayLines(vod.vod_play_from, vod.vod_play_url)
+      lines
     };
 
-    return json({ ok: true, vod: result });
+    return json({ ok: true, vod: result, playable: lines.some(line => line.episodes.length > 0) });
   } catch (error) {
     return json({ ok: false, error: error.message || '详情读取失败' }, 502);
   }
@@ -54,6 +74,7 @@ export async function onRequest({ request, env }) {
 function parsePlayLines(fromText, urlText) {
   const names = String(fromText || '线路1').split('$$$');
   const blocks = String(urlText || '').split('$$$');
+
   return blocks.map((block, lineIndex) => {
     const episodes = block.split('#').map((raw, episodeIndex) => {
       const item = raw.trim();
@@ -61,9 +82,18 @@ function parsePlayLines(fromText, urlText) {
       const sep = item.indexOf('$');
       const name = sep >= 0 ? item.slice(0, sep).trim() : `第${episodeIndex + 1}集`;
       const playId = sep >= 0 ? item.slice(sep + 1).trim() : item;
-      return { name: name || `第${episodeIndex + 1}集`, url: playId };
+      if (!playId) return null;
+      return {
+        name: name || `第${episodeIndex + 1}集`,
+        url: playId,
+        direct: /^https?:\/\//i.test(playId)
+      };
     }).filter(Boolean);
-    return { name: names[lineIndex] || `线路${lineIndex + 1}`, episodes };
+
+    return {
+      name: names[lineIndex] || `线路${lineIndex + 1}`,
+      episodes
+    };
   }).filter(line => line.episodes.length);
 }
 
