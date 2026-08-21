@@ -1,0 +1,1 @@
+This branch keeps LibreTV password protection optional. If Cloudflare Pages has no PASSWORD environment variable, the site and proxy remain accessible without a password. If PASSWORD is configured, the existing password flow remains available.
